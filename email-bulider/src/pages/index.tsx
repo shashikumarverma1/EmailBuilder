@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import type { EmailTemplate } from '@/type/emailType';
 import { EmailLayout } from '@/lib/storage';
 import { HexColorPicker } from 'react-colorful';
+import axios from 'axios';
 
 export default function EmailEditor() {
   const [template, setTemplate] = useState<EmailTemplate>({
@@ -15,6 +16,7 @@ export default function EmailEditor() {
   });
   const [titleColor, setTitleColor] = useState("#000000");
   const [showColorModal , setShowColorModal] = useState(false);
+   
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -28,7 +30,19 @@ export default function EmailEditor() {
     }
   };
 
-  const handleSave = async () => {
+  const  handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+   
+
+    try {
+      const response = await axios.post("http://localhost:3000/api/postemail", { ...template ,  id: crypto.randomUUID(), created_at: new Date().toISOString() });
+      toast.success('Template saved successfully');
+    } catch (err: any) {
+      console.log(err.response?.data?.message || "Something went wrong");
+      toast.error('Error saving template');
+    }
+  };
+  const handleSubmit = async () => {
     try {
       // Save to localStorage
       const templates = JSON.parse(localStorage.getItem('emailTemplates') || '[]');
