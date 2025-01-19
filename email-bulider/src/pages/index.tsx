@@ -19,11 +19,22 @@ export default function EmailEditor() {
    
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    console.log(file , "file")
     if (!file) return;
 
     try {
       const imageUrl = URL.createObjectURL(file);
       setTemplate(prev => ({ ...prev, imageUrl }));
+      const formData = new FormData();
+      formData.append('image', file);
+  
+      // Send FormData to the backend
+      const res = await axios.post("http://localhost:3000/api/uploadImage", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
       toast.success('Image uploaded successfully');
     } catch (error) {
       toast.error('Error uploading image');
